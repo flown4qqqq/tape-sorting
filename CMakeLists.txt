@@ -23,6 +23,7 @@ option(MYLIB_TESTING "Включить модульное тестировани
 #################################################################################
 
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_CXX_STANDARD 20)
 
 add_compile_options(
     -Werror
@@ -56,7 +57,7 @@ endif()
 ##
 #################################################################################
 
-add_executable(main src/main.cpp)
+add_executable(tape-sort src/main.cpp)
 
 #################################################################################
 ##
@@ -65,7 +66,8 @@ add_executable(main src/main.cpp)
 #################################################################################
 
 add_subdirectory(src)
-target_link_libraries(main tape-file)
+target_link_libraries(tape-sort tape-file)
+target_link_libraries(tape-sort cli)
 
 #################################################################################
 ##

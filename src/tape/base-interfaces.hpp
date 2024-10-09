@@ -1,4 +1,4 @@
-namespace BaseInterfaces {
+namespace NBaseInterfaces {
 
 class IBase {
 protected:
@@ -9,4 +9,4 @@ public:
     IBase& operator=(const IBase&) = delete;
 };
 
-} // namespace BaseInterfaces
+} // namespace NBaseInterfaces

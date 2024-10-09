@@ -1,6 +1,6 @@
-#include "interfaces.hpp"
+#include "tape-interface.hpp"
 
-namespace Tape {
+namespace NTape {
 
 class TTapeFile final : ITape {
 private:

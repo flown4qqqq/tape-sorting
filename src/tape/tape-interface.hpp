@@ -1,9 +1,9 @@
 #include <stdint.h>
 #include "base-interfaces.hpp"
 
-namespace Tape {
+namespace NTape {
 
-class ITape : BaseInterfaces::IBase {
+class ITape : NBaseInterfaces::IBase {
 protected:
     virtual ~ITape() = default;
 public:
@@ -13,4 +13,4 @@ public:
     virtual void WriteUInt32(uint32_t) = 0;
 };
 
-} // namespace Tape
+} // namespace NTape

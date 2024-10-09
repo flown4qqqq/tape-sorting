@@ -1,6 +1,6 @@
 #include "tape-file.hpp"
 
-namespace Tape {
+namespace NTape {
 
 TTapeFile::~TTapeFile() {
 
@@ -30,4 +30,4 @@ void TTapeFile::WriteUInt32(uint32_t) {
 
 }
 
-} // namespace Tape
+} // namespace NTape

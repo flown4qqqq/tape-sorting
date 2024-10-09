@@ -65,7 +65,7 @@ add_executable(main src/main.cpp)
 #################################################################################
 
 add_subdirectory(src)
-target_link_libraries(main foo)
+target_link_libraries(main tape-file)
 
 #################################################################################
 ##

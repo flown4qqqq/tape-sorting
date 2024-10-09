@@ -6,7 +6,7 @@ target_link_libraries(
     addition_ut
     PRIVATE
     GTest::GTest
-    foo
+    tape-file
 )
 
 add_test(addition_gtests addition_ut)

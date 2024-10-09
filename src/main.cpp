@@ -1,6 +1,6 @@
-#include <foo.hpp>
 #include <iostream>
+#include <tape-file.hpp>
 
 signed main() {
-    std::cout << TAdd::addition(2, 2) << std::endl;
+    std::cout << "Hello world!" << std::endl;
 }

@@ -1,7 +1,10 @@
-#include "tape-file.hpp"
 #include <random>
 #include <ctime>
 #include <stdexcept>
+#include <iostream>
+#include <filesystem>
+
+#include "tape-file.hpp"
 
 namespace NTape {
 
@@ -16,13 +19,14 @@ std::string TTapeFile::normilize(uint32_t n) {
 
 TTapeFile::~TTapeFile() {
     fclose(file);
+    std::filesystem::remove(this->filePath);
 }
 
 TTapeFile::TTapeFile()
     : pos(0)
     , size(0)
 {
-    std::mt19937 mt(std::time(nullptr));
+    std::mt19937 mt(static_cast<unsigned long>(std::time(nullptr)));
     std::string path = "/tmp/tape-sort-";
 
     for (size_t i = 0; i < 20; i++) {
@@ -31,6 +35,7 @@ TTapeFile::TTapeFile()
     }
 
     this->file = fopen(path.c_str(), "w+");
+    this->filePath = path;
 }
 
 TTapeFile::TTapeFile(std::string path)
@@ -44,10 +49,10 @@ TTapeFile::TTapeFile(std::string path)
 
     bool empty = true;
     uint32_t num = 0;
-    for (char c = fgetc(from); ; c = fgetc(from)) {
+    for (auto c = static_cast<char>(fgetc(from)); ; c = static_cast<char>(fgetc(from))) {
         if (isDigit(c)) {
             num *= 10;
-            num += (c - '0');
+            num += static_cast<uint32_t>(c - '0');
             empty = false;
         } else {
             if (!empty) {
@@ -66,11 +71,21 @@ TTapeFile::TTapeFile(std::string path)
     }
 
     fclose(from);
+    fseek(this->file, 0, SEEK_SET);
 }
 
 void TTapeFile::Delete() {
     delete this;
 }
+
+ITape* TTapeFile::Create() {
+    return static_cast<ITape*>(new TTapeFile());
+}
+
+ITape* TTapeFile::Create(std::string path) {
+    return static_cast<ITape*>(new TTapeFile(path));
+}
+
 
 bool TTapeFile::MoveLeft() {
     if (this->pos == 0) {
@@ -100,13 +115,13 @@ uint32_t TTapeFile::ReadUInt32() const {
     std::string num;
     num.reserve(normalizeCoefficient);
 
-    for (size_t i = 0; i < num.size(); i++) {
-        num.push_back(fgetc(this->file));
+    for (size_t i = 0; i < normalizeCoefficient; i++) {
+        num.push_back(static_cast<char>(fgetc(this->file)));
     }
 
     fseek(file, -normalizeCoefficient, SEEK_CUR);
 
-    return std::stoul(num);
+    return static_cast<uint32_t>(std::stoull(num)); // there is no stoui or smth, i don't know why
 }
 
 void TTapeFile::WriteUInt32(uint32_t num) {

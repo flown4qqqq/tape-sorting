@@ -1,9 +1,12 @@
+#pragma once
+
 #include <stdint.h>
+
 #include "base-interfaces.hpp"
 
 namespace NTape {
 
-class ITape : NBaseInterfaces::IBase {
+class ITape : public NBaseInterfaces::IBase {
 protected:
     virtual ~ITape() = default;
 public:

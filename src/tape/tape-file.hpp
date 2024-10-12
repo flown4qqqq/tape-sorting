@@ -1,4 +1,7 @@
+#pragma once
+
 #include <string>
+
 #include "tape-interface.hpp"
 
 namespace NTape {
@@ -8,8 +11,9 @@ private:
     uint32_t pos;
     size_t size;
     FILE* file;
+    std::string filePath;
 
-    static const size_t normalizeCoefficient = 19;
+    static const int32_t normalizeCoefficient = 19;
     static std::string normilize(uint32_t);
 
     ~TTapeFile();
@@ -22,6 +26,9 @@ public:
     bool MoveRight() override;
     uint32_t ReadUInt32() const override;
     void WriteUInt32(uint32_t) override;
+
+    static ITape* Create();
+    static ITape* Create(std::string path);
 };
 
 } // namespace Tape

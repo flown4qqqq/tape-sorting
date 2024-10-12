@@ -1,4 +1,6 @@
 #include <iostream>
+#include <filesystem>
+
 #include <tape-file.hpp>
 #include <cli.hpp>
 
@@ -58,6 +60,20 @@ use tape-sort --help)";
             std::cerr << message << std::endl;
             return 1;
         }
+
+        if (!std::filesystem::exists(settings.Infile.value())) {
+            std::string message = "No such InputFile";
+            std::cerr << message << std::endl;
+            return 1;
+        }
+
+        if (!std::filesystem::exists(settings.Outfile.value())) {
+            std::string message = "No such OutputFile";
+            std::cerr << message << std::endl;
+            return 1;
+        }
+
+        std::cout << "Work" << std::endl;
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
         return 1;

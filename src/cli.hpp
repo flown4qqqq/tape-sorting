@@ -13,8 +13,8 @@ R"(Usage: tape-sort [OPTION]... InputFile OutputFile
 Sorts InputFile into OutputFile.
 
 Options:
-    -h, --help        display this help and exit
-    -m, --memory      set RAM-coefficient, which means the maximum number of numbers that can be stored in RAM [default = 1024])";
+    -h, --help                    display this help and exit
+    -m, --memory=coefficient      set RAM-coefficient, which means the maximum number of numbers that can be stored in RAM [default = 1024])";
     std::cout << help << std::endl;
 }
 
@@ -94,7 +94,12 @@ public:
                     throw std::invalid_argument(message);
                 }
 
-                argHandles[i](settings, argv[optind]);
+                std::string arg = argv[optind];
+                if (arg[0] == '=') {
+                    arg = arg.substr(1);
+                }
+
+                argHandles[i](settings, arg);
             }
         }
     }

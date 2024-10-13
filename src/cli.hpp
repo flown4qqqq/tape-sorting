@@ -1,9 +1,9 @@
-#include <functional>
-#include <stdexcept>
 #include <iostream>
-#include <unordered_map>
-#include <map>
 #include <optional>
+#include <getopt.h>
+#include <vector>
+#include <map>
+#include <functional>
 
 namespace NCommandLine {
 
@@ -13,12 +13,14 @@ R"(Usage: tape-sort [OPTION]... InputFile OutputFile
 Sorts InputFile into OutputFile.
 
 Options:
-    -h, --help     display this help and exit)";
+    -h, --help        display this help and exit
+    -m, --memory      set RAM-coefficient, which means the maximum number of numbers that can be stored in RAM [default = 1024])";
     std::cout << help << std::endl;
 }
 
 struct TMainProgrammSettings {
     bool Help {false};
+    size_t MaxMemory {1024};
     std::optional<std::string> Infile;
     std::optional<std::string> Outfile;
 };
@@ -26,78 +28,74 @@ struct TMainProgrammSettings {
 template<typename TSettings>
 class TOptionHandler {
 private:
+    typedef std::function<void(TSettings&, std::string)> TOptWithValueHandle;
     typedef std::function<void(TSettings&)> TOptHandle;
     typedef std::function<void(TSettings&, std::string)> TArgHandle;
 
-    struct TOption {
-        enum TType {
-            Short,
-            Long
-        };
-
-        TType Type;
-        std::string Name;
-    };
-
-    std::unordered_map<std::string, TOptHandle> optionHandles;
-    std::map<size_t, TArgHandle> argumentHandles;
+    std::vector<option> opts;
+    std::map<char, TOptHandle> optHandles;
+    std::map<char, TOptWithValueHandle> optWithValuesHandles;
+    std::map<size_t, TArgHandle> argHandles;
+    std::map<std::string, char> shortNameByLong;
+    std::string format = "";
 public:
-    void AddOption(std::string name, TOptHandle handle) {
-        optionHandles[name] = handle;
+
+    void AddOption(char shortName, std::string fullName, TOptHandle handle) {
+        opts.push_back({fullName.c_str(), no_argument, nullptr, shortName});
+        optHandles[shortName] = handle;
+        format += shortName;
+        shortNameByLong[fullName] = shortName;
+    }
+
+    void AddOptionWithValue(char shortName, std::string fullName, TOptWithValueHandle handle) {
+        opts.push_back({fullName.c_str(), required_argument, nullptr, shortName});
+        optWithValuesHandles[shortName] = handle;
+        format += shortName;
+        format += ':';
+        shortNameByLong[fullName] = shortName;
     }
 
     void AddArgument(size_t index, TArgHandle handle) {
-        argumentHandles[index] = handle;
+        argHandles[index] = handle;
     }
 
-    void TryHandle(size_t argc, const char* argv[], TSettings& settings) {
-        const std::string programName = argv[0];
+    void Handle(int argc, char* const argv[], TSettings& settings) {
+        opts.push_back({nullptr, 0, nullptr, 0});
 
-        std::vector<std::string> parsedArguments;
-        parsedArguments.reserve(argc);
-        std::vector<TOption> parsedOptions;
-        parsedOptions.reserve(argc);
+        int optNowTmp;
+        int optionIndex;
 
-        for (size_t i = 1; i < argc; i++) {
-            std::string arg(argv[i]);
-
-            if (arg[0] == '-') {
-                auto type = TOption::TType::Short;
-
-                if (arg.size() > 1 && arg[1] == '-') {
-                    type = TOption::TType::Long;
-                }
-
-                if (type == TOption::TType::Short) {
-                    for (size_t j = 1; j < arg.size(); j++) {
-                        parsedOptions.push_back(TOption{type, static_cast<std::string>("-") + arg[j]});
-                    }
-                } else {
-                    parsedOptions.push_back(TOption{type, arg});
-                }
+        while ((optNowTmp = getopt_long(argc, argv, format.c_str(), opts.data(), &optionIndex)) != -1) {
+            char optNow;
+            if (optNowTmp == 0) {
+                optNow = shortNameByLong[opts[static_cast<size_t>(optionIndex)].name];
             } else {
-                parsedArguments.push_back(argv[i]);
+                optNow = static_cast<char>(optNowTmp);
+            }
+
+            if (optHandles.contains(optNow)) {
+                optHandles[optNow](settings);
+            } else if (optWithValuesHandles.contains(optNow)) {
+                optWithValuesHandles[optNow](settings, optarg);
+            } else {
+                std::string message = "There is not option \'";
+                message += static_cast<char>(optNow);
+                message += "\'";
+                throw std::invalid_argument(message);
             }
         }
 
-        for (const auto& option : parsedOptions) {
-            if (!optionHandles.contains(option.Name)) {
-                std::string message = static_cast<std::string>("option ") + "\'" + option.Name + "\'" + " doesn\'t allow an argument";
-                throw std::invalid_argument(message);
+        if (optind < argc) {
+            for (size_t i = 0; optind < argc; i++, optind++) {
+                if (!argHandles.contains(i)) {
+                    std::string message = "There is no argument with index \'";
+                    message += std::to_string(i);
+                    message += "\'";
+                    throw std::invalid_argument(message);
+                }
+
+                argHandles[i](settings, argv[optind]);
             }
-
-            optionHandles[option.Name](settings);
-        }
-
-        for (size_t i = 0; i < parsedArguments.size(); i++) {
-            const auto& argument = parsedArguments[i];
-
-            if (!argumentHandles.contains(i)) {
-                std::string message = "too much arguments";
-                throw std::invalid_argument(message);
-            }
-
-            argumentHandles[i](settings, argument);
         }
     }
 };

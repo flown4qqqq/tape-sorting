@@ -6,16 +6,16 @@
 
 namespace {
 
-NCommandLine::TMainProgrammSettings GetSettings(size_t argc, const char* argv[]) {
+NCommandLine::TMainProgrammSettings GetSettings(int argc, char* const argv[]) {
     using TSettings = NCommandLine::TMainProgrammSettings;
 
     NCommandLine::TOptionHandler<TSettings> parser;
-    parser.AddOption("--help", [](TSettings& settings) {
+    parser.AddOption('h', "help", [](TSettings& settings) {
         settings.Help = true;
     });
 
-    parser.AddOption("-h", [](TSettings& settings) {
-        settings.Help = true;
+    parser.AddOptionWithValue('m', "memory", [](TSettings& settings, std::string value) {
+        settings.MaxMemory = static_cast<size_t>(std::stoull(value));
     });
 
     parser.AddArgument(0, [](TSettings& settings, std::string value) {
@@ -29,14 +29,12 @@ NCommandLine::TMainProgrammSettings GetSettings(size_t argc, const char* argv[])
     TSettings settings;
 
     try {
-        parser.TryHandle(argc, argv, settings);
-    } catch (std::invalid_argument ex) {
+        parser.Handle(argc, argv, settings);
+    } catch (const std::exception& ex) {
         std::string message = "";
         message += static_cast<std::string>("tape-sort: ") + ex.what() + "\n";
         message += "Try \'tape-sort --help\' for more information";
         throw std::invalid_argument(message);
-    } catch (std::exception ex) {
-        throw ex;
     }
 
     return settings;
@@ -44,9 +42,9 @@ NCommandLine::TMainProgrammSettings GetSettings(size_t argc, const char* argv[])
 
 }
 
-signed main(int argc, const char* argv[]) {
+signed main(int argc, char* const argv[]) {
     try {
-        auto settings = GetSettings(static_cast<size_t>(argc), argv);
+        auto settings = GetSettings(argc, argv);
 
         if (settings.Help) {
             NCommandLine::ShowHelp();
@@ -73,7 +71,9 @@ use tape-sort --help)";
             return 1;
         }
 
-        std::cout << "Work" << std::endl;
+        std::cout << "Work:" << std::endl;
+        std::cout << settings.Infile.value() << std::endl;
+        std::cout << settings.Outfile.value() << std::endl;
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
         return 1;

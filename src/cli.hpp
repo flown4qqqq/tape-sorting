@@ -28,9 +28,9 @@ struct TMainProgrammSettings {
 template<typename TSettings>
 class TOptionHandler {
 private:
-    typedef std::function<void(TSettings&, std::string)> TOptWithValueHandle;
+    typedef std::function<void(TSettings&, const std::string&)> TOptWithValueHandle;
     typedef std::function<void(TSettings&)> TOptHandle;
-    typedef std::function<void(TSettings&, std::string)> TArgHandle;
+    typedef std::function<void(TSettings&, const std::string&)> TArgHandle;
 
     std::vector<option> opts;
     std::map<char, TOptHandle> optHandles;
@@ -40,14 +40,14 @@ private:
     std::string format = "";
 public:
 
-    void AddOption(char shortName, std::string fullName, TOptHandle handle) {
+    void AddOption(char shortName, const std::string& fullName, TOptHandle&& handle) {
         opts.push_back({fullName.c_str(), no_argument, nullptr, shortName});
         optHandles[shortName] = handle;
         format += shortName;
         shortNameByLong[fullName] = shortName;
     }
 
-    void AddOptionWithValue(char shortName, std::string fullName, TOptWithValueHandle handle) {
+    void AddOptionWithValue(char shortName, const std::string& fullName, TOptWithValueHandle&& handle) {
         opts.push_back({fullName.c_str(), required_argument, nullptr, shortName});
         optWithValuesHandles[shortName] = handle;
         format += shortName;
@@ -55,7 +55,7 @@ public:
         shortNameByLong[fullName] = shortName;
     }
 
-    void AddArgument(size_t index, TArgHandle handle) {
+    void AddArgument(size_t index, TArgHandle&& handle) {
         argHandles[index] = handle;
     }
 

@@ -14,15 +14,15 @@ NCommandLine::TMainProgrammSettings GetSettings(int argc, char* const argv[]) {
         settings.Help = true;
     });
 
-    parser.AddOptionWithValue('m', "memory", [](TSettings& settings, std::string value) {
+    parser.AddOptionWithValue('m', "memory", [](TSettings& settings, const std::string& value) {
         settings.MaxMemory = static_cast<size_t>(std::stoull(value));
     });
 
-    parser.AddArgument(0, [](TSettings& settings, std::string value) {
+    parser.AddArgument(0, [](TSettings& settings, const std::string& value) {
         settings.Infile = value;
     });
 
-    parser.AddArgument(1, [](TSettings& settings, std::string value) {
+    parser.AddArgument(1, [](TSettings& settings, const std::string& value) {
         settings.Outfile = value;
     });
 

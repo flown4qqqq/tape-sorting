@@ -71,9 +71,7 @@ use tape-sort --help)";
             return 1;
         }
 
-        std::cout << "Work:" << std::endl;
-        std::cout << settings.Infile.value() << std::endl;
-        std::cout << settings.Outfile.value() << std::endl;
+        NTape::Sort(settings.Infile.value(), settings.Outfile.value(), settings.MaxMemory);
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
         return 1;

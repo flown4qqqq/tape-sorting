@@ -3,6 +3,7 @@
 #include <string>
 
 #include "tape-interface.hpp"
+#include "sort.hpp"
 
 namespace NTape {
 
@@ -30,5 +31,7 @@ public:
     static ITape* Create();
     static ITape* Create(std::string path);
 };
+
+void Sort(std::string input, std::string output, size_t maxMemory);
 
 } // namespace Tape

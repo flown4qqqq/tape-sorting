@@ -3,7 +3,9 @@
 #include <iostream>
 
 namespace NTape {
-    void Sort([[maybe_unused]] std::unique_ptr<ITape> input, [[maybe_unused]] std::unique_ptr<ITape> output) {
-
+    void Sort(TUniquePtr<ITape>& input, TUniquePtr<ITape>& output, size_t maxMemory) {
+        std::cout << &input << std::endl;
+        std::cout << &output << std::endl;
+        std::cout << maxMemory << std::endl;
     }
 }

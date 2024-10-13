@@ -5,5 +5,8 @@
 #include "tape-interface.hpp"
 
 namespace NTape {
-    void Sort(std::unique_ptr<ITape> input, std::unique_ptr<ITape> output);
+    template <class I>
+    using TUniquePtr = std::unique_ptr<I, NBaseInterfaces::IBase::BaseDeleter>;
+
+    void Sort(TUniquePtr<ITape>& input, TUniquePtr<ITape>& output, size_t maxMemory);
 }

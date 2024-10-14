@@ -55,7 +55,12 @@ void TOptionHandler<TSettings>::Handle(int argc, char* const argv[], TSettings& 
         if (optHandles.contains(optNow)) {
             optHandles[optNow](settings);
         } else if (optWithValuesHandles.contains(optNow)) {
-            optWithValuesHandles[optNow](settings, optarg);
+            std::string arg = optarg;
+            if (arg[0] == '=') {
+                arg = arg.substr(1);
+            }
+
+            optWithValuesHandles[optNow](settings, arg);
         } else {
             std::string message = "There is not option \'";
             message += static_cast<char>(optNow);
@@ -74,10 +79,6 @@ void TOptionHandler<TSettings>::Handle(int argc, char* const argv[], TSettings& 
             }
 
             std::string arg = argv[optind];
-            if (arg[0] == '=') {
-                arg = arg.substr(1);
-            }
-
             argHandles[i](settings, arg);
         }
     }

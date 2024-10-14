@@ -1,12 +1,13 @@
-#include <random>
 #include <ctime>
-#include <stdexcept>
 #include <iostream>
 #include <filesystem>
+#include <fstream>
 
 #include "tape-file.hpp"
 
 namespace NTape {
+
+std::mt19937 TTapeFile::randomGenerator(static_cast<unsigned long>(std::time(nullptr)));
 
 std::string TTapeFile::normalize(uint32_t n) {
     auto result = std::to_string(n);
@@ -26,11 +27,10 @@ TTapeFile::TTapeFile()
     : pos(0)
     , size(0)
 {
-    std::mt19937 mt(static_cast<unsigned long>(std::time(nullptr)));
     std::string path = "/tmp/tape-sort-";
 
     for (size_t i = 0; i < 20; i++) {
-        char c = 'a' + mt() % ('z' - 'a' + 1);
+        char c = 'a' + randomGenerator() % ('z' - 'a' + 1);
         path += c;
     }
 
@@ -173,10 +173,21 @@ size_t TTapeFile::Size() const {
 
 
 void Sort(std::string input, std::string output, size_t maxMemory) {
-    TUniquePtr<ITape> intape(TTapeFile::Create(input));
-    TUniquePtr<ITape> outtape(TTapeFile::Create(output));
-    TUniquePtr<ITape> temptape(TTapeFile::Create());
-    Sort(intape, outtape, temptape, maxMemory);
+    TUniquePtr<ITape> sorted(TTapeFile::Create(input));
+    TUniquePtr<ITape> temp1(TTapeFile::Create());
+    TUniquePtr<ITape> temp2(TTapeFile::Create());
+    sorted->ReadUInt32();
+    Sort(sorted, temp1, temp2, maxMemory);
+
+    std::ofstream out;
+    out.open(output);
+
+    sorted->SetCurrentPosition(0);
+
+    while (sorted->GetCurrentPosition() != sorted->Size()) {
+        out << sorted->ReadUInt32() << '\n';
+        sorted->MoveRight();
+    }
 }
 
 } // namespace NTape

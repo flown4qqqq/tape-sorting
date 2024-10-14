@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <random>
 
 #include "tape-interface.hpp"
 #include "sort.hpp"
@@ -9,6 +10,8 @@ namespace NTape {
 
 class TTapeFile final : ITape {
 private:
+    static std::mt19937 randomGenerator;
+
     size_t pos;
     size_t size;
     FILE* file;

@@ -24,9 +24,10 @@ public:
 
     void Delete() override;
     bool MoveLeft() override;
-    bool MoveRight() override;
+    bool MoveRight(bool forced = false) override;
     uint32_t ReadUInt32() const override;
     void WriteUInt32(uint32_t) override;
+    size_t Size() const override;
 
     static ITape* Create();
     static ITape* Create(std::string path);

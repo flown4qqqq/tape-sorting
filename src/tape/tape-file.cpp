@@ -97,9 +97,13 @@ bool TTapeFile::MoveLeft() {
     return true;
 }
 
-bool TTapeFile::MoveRight() {
+bool TTapeFile::MoveRight(bool forced) {
     if (this->pos == this->size) {
-        return false;
+        if (forced) {
+            this->size++;
+        } else {
+            return false;
+        }
     }
 
     this->pos++;
@@ -134,12 +138,17 @@ void TTapeFile::WriteUInt32(uint32_t num) {
     fseek(file, -normalizeCoefficient, SEEK_CUR);
 }
 
+size_t TTapeFile::Size() const {
+    return this->size;
+}
+
 
 
 void Sort(std::string input, std::string output, size_t maxMemory) {
     TUniquePtr<ITape> intape(TTapeFile::Create(input));
     TUniquePtr<ITape> outtape(TTapeFile::Create(output));
-    Sort(intape, outtape, maxMemory);
+    TUniquePtr<ITape> temptape(TTapeFile::Create());
+    Sort(intape, outtape, temptape, maxMemory);
 }
 
 } // namespace NTape

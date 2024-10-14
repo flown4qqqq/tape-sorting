@@ -68,6 +68,42 @@ TEST(TapeFileUt, SetGetCurrentPosition) {
     std::filesystem::remove_all(pathDir);
 }
 
+TEST(TapeFileUt, WriteMoveForce) {
+    std::string pathDir = GetCurrentDirectory() + "/tmp";
+    std::filesystem::create_directory(pathDir);
+    std::string pathFile = pathDir + "/a.txt";
+    std::ofstream out;
+    out.open(pathFile);
+
+    TUniquePtr<NTape::ITape> tape(NTape::TTapeFile::Create(pathFile));
+
+    tape->WriteUInt32(10, true);
+    tape->MoveRight();
+    tape->WriteUInt32(20, true);
+    tape->MoveRight();
+    tape->WriteUInt32(30, true);
+    tape->MoveRight();
+    tape->WriteUInt32(40, true);
+    tape->MoveRight();
+    tape->MoveRight(true);
+
+    std::vector<uint32_t> expected = {10, 20, 30, 40, 0};
+    std::vector<uint32_t> actual = {};
+    tape->SetCurrentPosition(0);
+    actual.push_back(tape->ReadUInt32());
+    tape->MoveRight();
+    actual.push_back(tape->ReadUInt32());
+    tape->MoveRight();
+    actual.push_back(tape->ReadUInt32());
+    tape->MoveRight();
+    actual.push_back(tape->ReadUInt32());
+    tape->MoveRight();
+    actual.push_back(tape->ReadUInt32());
+    tape->MoveRight();
+
+    std::filesystem::remove_all(pathDir);
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

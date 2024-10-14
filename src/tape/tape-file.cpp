@@ -98,18 +98,20 @@ bool TTapeFile::MoveLeft() {
 }
 
 bool TTapeFile::MoveRight(bool forced) {
-    if (this->pos == this->size) {
-        if (forced) {
-            this->size++;
-            auto normZero = normalize(uint32_t());
-            fputs(normZero.c_str(), this->file);
-        } else {
-            return false;
-        }
+    if (!forced && this->pos == this->size) {
+        return false;
     }
 
-    this->pos++;
-    fseek(file, normalizeCoefficient + 1, SEEK_CUR);
+    if (this->pos == this->size) {
+        this->pos++;
+        this->size++;
+        auto normZero = normalize(uint32_t()) + "\n";
+        fputs(normZero.c_str(), this->file);
+    } else {
+        this->pos++;
+        fseek(file, normalizeCoefficient + 1, SEEK_CUR);
+    }
+
     return true;
 }
 
@@ -145,20 +147,22 @@ uint32_t TTapeFile::ReadUInt32() const {
 }
 
 bool TTapeFile::WriteUInt32(uint32_t num, bool forced) {
-    if (this->pos == this->size) {
-        if (forced) {
-            this->size++;
-            auto normZero = normalize(uint32_t());
-            fputs(normZero.c_str(), this->file);
-        } else {
-            return false;
-        }
+    if (!forced && this->pos == this->size) {
+        return false;
     }
 
     std::string normNum = normalize(num);
-    fputs(normNum.c_str(), this->file);
 
-    fseek(file, -normalizeCoefficient, SEEK_CUR);
+    if (this->pos == this->size) {
+        this->size++;
+        normNum += "\n";
+        fputs(normNum.c_str(), this->file);
+        fseek(file, -(normalizeCoefficient + 1), SEEK_CUR);
+    } else {
+        fputs(normNum.c_str(), this->file);
+        fseek(file, -normalizeCoefficient, SEEK_CUR);
+    }
+
     return true;
 }
 

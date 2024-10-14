@@ -8,7 +8,7 @@
 
 namespace NTape {
 
-std::string TTapeFile::normilize(uint32_t n) {
+std::string TTapeFile::normalize(uint32_t n) {
     auto result = std::to_string(n);
     while (result.size() < normalizeCoefficient) {
         result = "0" + result;
@@ -57,7 +57,7 @@ TTapeFile::TTapeFile(std::string path)
         } else {
             if (!empty) {
                 empty = true;
-                auto normNum = normilize(num);
+                auto normNum = normalize(num);
                 num = 0;
                 this->size++;
                 fputs(normNum.c_str(), this->file);
@@ -101,6 +101,8 @@ bool TTapeFile::MoveRight(bool forced) {
     if (this->pos == this->size) {
         if (forced) {
             this->size++;
+            auto normZero = normalize(uint32_t());
+            fputs(normZero.c_str(), this->file);
         } else {
             return false;
         }
@@ -108,6 +110,16 @@ bool TTapeFile::MoveRight(bool forced) {
 
     this->pos++;
     fseek(file, normalizeCoefficient + 1, SEEK_CUR);
+    return true;
+}
+
+bool TTapeFile::SetCurrentPosition(size_t pos) {
+    if (pos > this->size) {
+        return false;
+    }
+
+    this->pos = pos;
+    fseek(file, (normalizeCoefficient + 1) * pos, SEEK_SET);
     return true;
 }
 
@@ -129,7 +141,7 @@ uint32_t TTapeFile::ReadUInt32() const {
 }
 
 void TTapeFile::WriteUInt32(uint32_t num) {
-    std::string normNum = normilize(num);
+    std::string normNum = normalize(num);
 
     for (size_t i = 0; i < normNum.size(); i++) {
         fputc(normNum[i], this->file);

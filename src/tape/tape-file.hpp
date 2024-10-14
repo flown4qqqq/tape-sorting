@@ -15,7 +15,7 @@ private:
     std::string filePath;
 
     static const int32_t normalizeCoefficient = 19;
-    static std::string normilize(uint32_t);
+    static std::string normalize(uint32_t);
 
     ~TTapeFile();
 public:
@@ -23,10 +23,14 @@ public:
     TTapeFile(std::string);
 
     void Delete() override;
+
     bool MoveLeft() override;
     bool MoveRight(bool forced = false) override;
+    bool SetCurrentPosition(size_t) override;
+
     uint32_t ReadUInt32() const override;
     void WriteUInt32(uint32_t) override;
+
     size_t Size() const override;
 
     static ITape* Create();

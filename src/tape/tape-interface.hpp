@@ -16,7 +16,7 @@ public:
     virtual size_t GetCurrentPosition() const = 0;
 
     virtual uint32_t ReadUInt32() const = 0;
-    virtual void WriteUInt32(uint32_t) = 0;
+    virtual bool WriteUInt32(uint32_t, bool forced) = 0;
 
     virtual size_t Size() const = 0;
 };

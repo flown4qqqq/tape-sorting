@@ -144,14 +144,22 @@ uint32_t TTapeFile::ReadUInt32() const {
     return static_cast<uint32_t>(std::stoull(num)); // there is no stoui or smth, i don't know why
 }
 
-void TTapeFile::WriteUInt32(uint32_t num) {
-    std::string normNum = normalize(num);
-
-    for (size_t i = 0; i < normNum.size(); i++) {
-        fputc(normNum[i], this->file);
+bool TTapeFile::WriteUInt32(uint32_t num, bool forced) {
+    if (this->pos == this->size) {
+        if (forced) {
+            this->size++;
+            auto normZero = normalize(uint32_t());
+            fputs(normZero.c_str(), this->file);
+        } else {
+            return false;
+        }
     }
 
+    std::string normNum = normalize(num);
+    fputs(normNum.c_str(), this->file);
+
     fseek(file, -normalizeCoefficient, SEEK_CUR);
+    return true;
 }
 
 size_t TTapeFile::Size() const {

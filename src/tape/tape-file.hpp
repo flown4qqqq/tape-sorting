@@ -30,7 +30,7 @@ public:
     size_t GetCurrentPosition() const override;
 
     uint32_t ReadUInt32() const override;
-    void WriteUInt32(uint32_t) override;
+    bool WriteUInt32(uint32_t, bool forced = false) override;
 
     size_t Size() const override;
 

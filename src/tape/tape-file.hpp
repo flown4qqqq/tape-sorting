@@ -9,7 +9,7 @@ namespace NTape {
 
 class TTapeFile final : ITape {
 private:
-    uint32_t pos;
+    size_t pos;
     size_t size;
     FILE* file;
     std::string filePath;
@@ -27,6 +27,7 @@ public:
     bool MoveLeft() override;
     bool MoveRight(bool forced = false) override;
     bool SetCurrentPosition(size_t) override;
+    size_t GetCurrentPosition() const override;
 
     uint32_t ReadUInt32() const override;
     void WriteUInt32(uint32_t) override;

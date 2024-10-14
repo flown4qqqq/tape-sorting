@@ -119,8 +119,12 @@ bool TTapeFile::SetCurrentPosition(size_t pos) {
     }
 
     this->pos = pos;
-    fseek(file, (normalizeCoefficient + 1) * pos, SEEK_SET);
+    fseek(file, static_cast<int32_t>((normalizeCoefficient + 1) * pos), SEEK_SET);
     return true;
+}
+
+size_t TTapeFile::GetCurrentPosition() const {
+    return this->pos;
 }
 
 uint32_t TTapeFile::ReadUInt32() const {
